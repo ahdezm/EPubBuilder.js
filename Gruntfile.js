@@ -17,6 +17,23 @@ module.exports = function(grunt) {
 					livereload:true
 				}
 			}
+		},
+		bump:{
+			options:{
+				files: ['package.json','bower.json'],
+				commit: true,
+				commitMessage: 'Release v%VERSION%',
+				commitFiles: ['-a'],
+				createTag:false,
+				push: true,
+				pushTo: 'origin',
+				gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d' // options to use with '$ git describe'
+			},
+			major:{
+				createTag: true,
+				tagName: 'v%VERSION%',
+				tagMessage: 'Version %VERSION%',
+			}
 		}
 	});
 
@@ -25,6 +42,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-bump');
+
+	grunt.renameTask("bump",'release');
 
 	grunt.registerTask('build', ['useminPrepare','concat','uglify']);
 	grunt.registerTask('server', ['connect','watch']);
