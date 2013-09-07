@@ -1,5 +1,3 @@
-// NOTE: Investigate DOM Promises as a way to make the API run async.
-
 (function(window,undefined){
 	/*
 	new Book({
@@ -9,10 +7,13 @@
 	},function(book){ @callback });
 	*/
 
-	// TODO: Find a way to integrate web workers. This wont work for production.
-	//zip.workerScriptsPath = 'libs/zip.js/WebContent/';
+	// Works with inline script instead of workers to minimize dependencies, this may change later.
 	zip.useWebWorkers = false;
+
 	// TODO: Check for zip.js support.
+	// TODO: Add multiple language support.
+	// TODO: Add config options.
+	// TODO: Add xml validator.
 
 	var isStringArray = function(array){
 		return array.filter(function(self){
@@ -115,11 +116,11 @@
 
 			} catch(e){}
 
-			if('text' in arguments[0]){
-				if(!isStringArray(arguments[0].text)){
+			if('chapters' in arguments[0]){
+				if(!isStringArray(arguments[0].chapters)){
 					throw new Error("Book(): The Array must contain only strings.");
 				}
-				this.chapters = arguments[0].text;
+				this.chapters = arguments[0].chapters;
 			} else {
 				throw new Error("Book(): To create a book the parameter text is required.")
 			}
