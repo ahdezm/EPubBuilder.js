@@ -20,4 +20,7 @@ or
 new Book([Array of Chapters],callback);
 ```
 ## Config
-The script also requires some templates, that you need to download and then connect usinf the Book.config.templatePath property.
+
+The only dependency the script has is a folder of templates, the oath to which needs to be configured using the setting Book.config.templatePath.
+
+It also counts with an option to validate the chapters xhtml inputed to avoid faulty ePubs. This option can be tuned on with the Book.config.validateXML option, which defaults to false.

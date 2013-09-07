@@ -3,7 +3,7 @@
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
 		<dc:title>{{title}}</dc:title> 
 		<dc:creator opf:role="aut">{{author}}</dc:creator>
-		<dc:language>en-US</dc:language> 
+		<dc:language>{{lang}}</dc:language> 
 		<dc:rights>Public Domain</dc:rights> 
 		<dc:publisher>EPubBuilder.js</dc:publisher> 
 		<dc:identifier id="BookID" opf:scheme="UUID">{{uuid}}</dc:identifier>

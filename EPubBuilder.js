@@ -11,9 +11,6 @@
 	zip.useWebWorkers = false;
 
 	// TODO: Check for zip.js support.
-	// TODO: Add multiple language support.
-	// TODO: Add config options.
-	// TODO: Add xml validator.
 
 	var isStringArray = function(array){
 		return array.filter(function(self){
@@ -76,6 +73,7 @@
 			title:self.title,
 			author:self.author,
 			chapters:self.chapters,
+			lang:self.language,
 			// UUID Random Generator.
 			uuid:'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);})
 		})],{type:"application/oebps-package+xml"}));
@@ -86,7 +84,7 @@
 		for (var i = self.chapters.length - 1; i >= 0; i--) {
 			var chapterText = Book.templates.chapter({text:self.chapters[i],index:i+1});
 			// Basic XML Parser.
-			if(!!Book.config.parseXML){
+			if(!!Book.config.validateXML){
 				if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
 					throw new Error("Book(): Invalid XHTML in chapters[" + i + "]")
 				}
@@ -119,10 +117,18 @@
 			try {
 				this.title = arguments[0].title;
 				this.author = arguments[0].author;
-
-				var templatePath = arguments[0].templatePath;
-
 			} catch(e){}
+
+			if('language' in arguments[0]){
+				// TODO: Add a more advanced check.
+				if(/[a-z][a-z]-[A-Z][A-Z]/g.test(arguments[0].language)){
+					this.language = arguments[0].language;
+				} else {
+					throw new Error("Book(): The language parameter must comply with RFC 3066 ex:en-US.");
+				}
+			} else {
+				this.language = 'en-US';
+			}
 
 			if('chapters' in arguments[0]){
 				if(!isStringArray(arguments[0].chapters)){
@@ -168,7 +174,7 @@
 	Book.templates = {};
 
 	Book.config.templatePath = "templates/";
-	Book.config.parseXML = false;
+	Book.config.validateXML = true;
 
 	window.Book = Book;
 
