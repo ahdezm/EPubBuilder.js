@@ -1,0 +1,12 @@
+#book .title, #book .author {
+	text-align:center;
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+#chapter {
+	margin: 2em;
+}
+
+#chapter .title {
+	text-align: center;
+}

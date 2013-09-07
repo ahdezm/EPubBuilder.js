@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<!-- build:js EPubBuilder.min.js -->
+<script src="libs/handlebars/handlebars.js"></script>
+<script src="libs/FileSaver/FileSaver.js"></script>
+<script src="libs/zip.js/WebContent/zip.js"></script>
+<script src="libs/zip.js/WebContent/zip-fs.js"></script>
+<script src="libs/zip.js/WebContent/deflate.js"></script>
+<script src="EPubBuilder.js"></script>
+<!-- endbuild -->
+<script>
+	new Book({
+		title:"Finding Nemo",
+		author:"Nemo's Father",
+		text:["<p>Hello</p>","World"]
+	},function(book){
+		book.exportBlob(function(blob){
+			console.log(blob)
+		});
+	});
+</script>
+</body>
+</html>
