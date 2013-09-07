@@ -84,7 +84,15 @@
 		book.addText("style.css",Book.templates.style)
 
 		for (var i = self.chapters.length - 1; i >= 0; i--) {
-			book.addBlob("chap" + (i+1) + ".xhtml",new Blob([Book.templates.chapter({text:self.chapters[i],index:i+1})],{type:"application/xhtml+xml"}));
+			var chapterText = Book.templates.chapter({text:self.chapters[i],index:i+1});
+			// Basic XML Parser.
+			if(!!Book.config.parseXML){
+				if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
+					throw new Error("Book(): Invalid XHTML in chapters[" + i + "]")
+				}
+			}
+
+			book.addBlob("chap" + (i+1) + ".xhtml",new Blob([],{type:"application/xhtml+xml"}));
 		};
 
 		self._zip = fs;
@@ -122,7 +130,7 @@
 				}
 				this.chapters = arguments[0].chapters;
 			} else {
-				throw new Error("Book(): To create a book the parameter text is required.")
+				throw new Error("Book(): To create a book the parameter chapters of is required.")
 			}
 		} else if(arguments[0] instanceof Array){
 			if(!isStringArray(arguments[0])){
@@ -158,7 +166,9 @@
 	// TODO: Add a more advanced config function.
 	Book.config = {};
 	Book.templates = {};
+
 	Book.config.templatePath = "templates/";
+	Book.config.parseXML = false;
 
 	window.Book = Book;
 
