@@ -1,6 +1,6 @@
 {
   "name": "EPubBuilder.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A javascript-based ePub Builder",
   "main": "EPubBuilder.min.js",
   "keywords": [
