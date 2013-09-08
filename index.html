@@ -13,11 +13,13 @@
 <script src="EPubBuilder.js"></script>
 <!-- endbuild -->
 <script>
+	console.time("newBook");
 	new Book({
 		title:"Finding Nemo",
 		author:"Nemo's Father",
 		chapters:["Hello","World"]
 	},function(book){
+		console.timeEnd("newBook");
 		book.exportBlob(function(blob){
 			console.log(blob)
 		});
