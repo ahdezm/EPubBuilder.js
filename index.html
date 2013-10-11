@@ -4,25 +4,26 @@
 	<title></title>
 </head>
 <body>
-<!-- build:js EPubBuilder.min.js -->
+<!-- EPubBuilder.js Dependencies -->
 <script src="libs/handlebars/handlebars.js"></script>
 <script src="libs/FileSaver/FileSaver.js"></script>
 <script src="libs/zip.js/WebContent/zip.js"></script>
 <script src="libs/zip.js/WebContent/zip-fs.js"></script>
 <script src="libs/zip.js/WebContent/deflate.js"></script>
+<script src="https://rawgithub.com/Polymer/observe-js/master/src/observe.js"></script>
+<!-- Dependencies End -->
 <script src="EPubBuilder.js"></script>
-<!-- endbuild -->
+
 <script>
 	console.time("newBook");
-	new Book({
+	var book = new Book({
 		title:"Finding Nemo",
 		author:"Nemo's Father",
-		chapters:["Hello","World"]
-	},function(book){
+	});
+	book.addChapter("Hello");
+	book.exportBlob(function(blob){
 		console.timeEnd("newBook");
-		book.exportBlob(function(blob){
-			console.log(blob)
-		});
+		console.log(blob)
 	});
 </script>
 </body>
