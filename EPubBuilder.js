@@ -14,7 +14,7 @@
 
 	var isStringArray = function(array){
 		return array.filter(function(self){
-			return(typeof(self) !== 'string'); 
+			return(typeof(self) !== 'string');
 		}).length < 1;
 	};
 
@@ -24,7 +24,7 @@
 			return;
 		}
 
-		var exclude = exclude || [];
+		exclude = exclude || [];
 		var toLoad = templates.concat(exclude);
 
 		function loadFile(file){
@@ -36,10 +36,11 @@
 
 			xhr.onload = function(){
 				if(this.status == '200'){
-					var name = file.slice(0,(file.indexOf(".") > 0)?file.indexOf("."):file.length-1);
+					var name = file.slice(0,(file.indexOf(".") > 0)?file.indexOf("."):file.length-1),
+						template = false;
 					if(!new RegExp(exclude.join('|')).test(file)){
-						var template = Handlebars.compile(this.response);
-					}	
+						template = Handlebars.compile(this.response);
+					}
 					Book.templates[name] = template || this.response;
 					
 					// TODO: Check for objects instead of length.
@@ -49,13 +50,13 @@
 				} else {
 					var error = new Error("Book() loadTemplate: Could not load template from path ",path);
 				}
-			}
+			};
 		}
 
 		for (var i = toLoad.length - 1; i >= 0; i--) {
 			loadFile(toLoad[i]);
-		};
-	}
+		}
+	};
 
 	var loadFS = function(){
 		// TODO: Add Error callback to Filesystem API.
@@ -67,7 +68,7 @@
 
 		fs.root.addText('mimetype','application/epub+zip');
 
-		meta.addBlob('container.xml',new Blob(['<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'],{type:'application/xml'}))
+		meta.addBlob('container.xml',new Blob(['<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'],{type:'application/xml'}));
 
 		book.addBlob('content.opf',new Blob([Book.templates.content({
 			title:self.title,
@@ -79,26 +80,26 @@
 		})],{type:"application/oebps-package+xml"}));
 
 		book.addBlob("title_page.xhtml",new Blob([Book.templates.title_page({title:self.title,author:self.author})],{type:"application/xhtml+xml"}));
-		book.addText("style.css",Book.templates.style)
+		book.addText("style.css",Book.templates.style);
 
 		for (var i = self.chapters.length - 1; i >= 0; i--) {
 			var chapterText = Book.templates.chapter({text:self.chapters[i],index:i+1});
 			// Basic XML Parser.
 			if(!!Book.config.validateXML){
 				if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
-					throw new Error("Book(): Invalid XHTML in chapters[" + i + "]")
+					throw new Error("Book(): Invalid XHTML in chapters[" + i + "]");
 				}
 			}
 
-			book.addBlob("chap" + (i+1) + ".xhtml",new Blob([],{type:"application/xhtml+xml"}));
-		};
+			book.addBlob("chap" + (i+1) + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
+		}
 
 		self._zip = fs;
 
 		if(!!self._done){
 			self._done(self);
 		}
-	}
+	};
 
 	Handlebars.registerHelper("chapter",function(index){
 		return parseInt(index,10) + 1;
@@ -110,7 +111,7 @@
 
 	var Book = function(){
 		if(!(this instanceof Book)){
-			throw new Error("Book(): Function must be a new instance.")
+			throw new Error("Book(): Function must be a new instance.");
 		}
 
 		if(Object.prototype.toString.call(arguments[0]) === "[object Object]"){
@@ -136,7 +137,7 @@
 				}
 				this.chapters = arguments[0].chapters;
 			} else {
-				throw new Error("Book(): To create a book the parameter chapters of is required.")
+				throw new Error("Book(): To create a book the parameter chapters of is required.");
 			}
 		} else if(arguments[0] instanceof Array){
 			if(!isStringArray(arguments[0])){
@@ -166,7 +167,7 @@
 			this._zip.root.exportBlob(function(blob){
 				window.saveAs(blob,self.title + ' - ' + self.author + '.epub');
 			});
-		}	
+		}
 	};
 
 	// TODO: Add a more advanced config function.
