@@ -12,7 +12,7 @@
 
 	// TODO: Check for zip.js support.
 	// TODO: Add queueClean method.
-
+	
 	var isStringArray = function(array){
 		return array.filter(function(self){
 			return(typeof(self) !== 'string');
@@ -37,44 +37,35 @@
 		return queue;
 	};
 
-	var loadTemplates = function(templates,exclude,done){
+	var loadTemplates = function(done){
 		if(Object.keys(Book.templates).length > 0){
 			done();
 			return;
 		}
 
-		exclude = exclude || [];
-		var toLoad = templates.concat(exclude);
+		var xhr = new XMLHttpRequest();
+		xhr.responseType = 'text';
+		xhr.open("GET",Book.config.templateJSON,true);
+		xhr.send();
 
-		function loadFile(file){
-			var path = Book.config.templatePath + file;
-			var xhr = new XMLHttpRequest();
-			xhr.responseType = 'text';
-			xhr.open("GET",path,true);
-			xhr.send();
-
-			xhr.onload = function(){
-				if(this.status == '200'){
-					var name = file.slice(0,(file.indexOf(".") > 0)?file.indexOf("."):file.length-1),
-						template = false;
-					if(!new RegExp(exclude.join('|')).test(file)){
-						template = Handlebars.compile(this.response);
-					}
-					Book.templates[name] = template || this.response;
-					
-					// TODO: Check for objects instead of length.
-					if(Object.keys(Book.templates).length === toLoad.length){
-						done();
-					}
-				} else {
-					var error = new Error("Book() loadTemplate: Could not load template from path ",path);
+		xhr.onload = function(){
+			if(this.status == '200'){
+				try {
+					Book.templates = JSON.parse(this.response);
+				} catch(e){
+					throw new Error("Book() loadJSON: Uable to parse " + Book.config.templateJSON + ' JSON file.');
 				}
-			};
-		}
-
-		for (var i = toLoad.length - 1; i >= 0; i--) {
-			loadFile(toLoad[i]);
-		}
+				for(var file in Book.templates){
+					if(Book.config.templateCompile.indexOf(file) > -1){
+						Book.templates[file] = Handlebars.compile(Book.templates[file]);
+					}
+				}
+				done();
+				
+			} else {
+				var error = new Error("Book() loadJSON: Could not load JSON template file from path ",Book.config.templateJSON);
+			}
+		};
 	};
 
 	var createZip = function(callback){
@@ -158,7 +149,7 @@
 
 		self._queue = new Queue();
 		// NOTE: Consider using an object instead of an array. 
-		self._queue.push(loadTemplates.bind(self,['content.opf','chapter.xhtml','title_page.xhtml'],['style.css']));
+		self._queue.push(loadTemplates);
 		self._queue.push(createZip.bind(self));
 	};
 
@@ -207,8 +198,12 @@
 	Book.config = {};
 	Book.templates = {};
 
-	Book.config.templatePath = "templates/";
+	Book.config.templateJSON = "template.json";
+	Book.config.templateCompile = ['content','chapter','title_page'];
 	Book.config.validateXML = true;
+
+	// To prevent changes to config.
+	Object.preventExtensions(Book.config);
 
 	window.Book = Book;
 
