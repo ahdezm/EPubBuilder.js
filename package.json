@@ -12,11 +12,9 @@
   "author": "polikis",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "grunt-usemin": "~0.1.12",
-    "grunt-contrib-concat": "~0.3.0",
+    "grunt":"~0.4.1",
     "grunt-contrib-uglify": "~0.2.4",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-connect": "~0.4.1",
-    "grunt-release": "~0.5.1"
+    "grunt-contrib-connect": "~0.4.1"
   }
 }

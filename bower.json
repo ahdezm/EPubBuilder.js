@@ -11,11 +11,13 @@
   "ignore": [
     "**/.*",
     "node_modules",
+    "libs",
     "test"
   ],
   "dependencies": {
     "FileSaver": "*",
     "handlebars": "~1.0.0",
-    "zip.js": "gildas-lormeau/zip.js"
+    "zip.js": "gildas-lormeau/zip.js",
+    "observe.js":"Polymer/observe-js"
   }
 }

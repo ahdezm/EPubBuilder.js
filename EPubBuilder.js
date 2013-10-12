@@ -11,11 +11,30 @@
 	zip.useWebWorkers = false;
 
 	// TODO: Check for zip.js support.
+	// TODO: Add queueClean method.
 
 	var isStringArray = function(array){
 		return array.filter(function(self){
 			return(typeof(self) !== 'string');
 		}).length < 1;
+	};
+
+	var Queue = function(){
+		var queue = [];
+		var taskCallback = function(){
+			queue.shift();
+			if(queue.length > 0){
+				queue[0](taskCallback);
+			}
+		};
+		
+		new ArrayObserver(queue,function(splices){
+			if(queue.length > 0 && queue.length - splices[0].addedCount === 0){
+				queue[0](taskCallback);
+			}
+		});
+		
+		return queue;
 	};
 
 	var loadTemplates = function(templates,exclude,done){
@@ -58,13 +77,15 @@
 		}
 	};
 
-	var loadFS = function(){
+	var createZip = function(callback){
 		// TODO: Add Error callback to Filesystem API.
 		var self =  this;
 		var fs = new zip.fs.FS();
 
 		var meta = fs.root.addDirectory("META-INF");
 		var book = fs.root.addDirectory("OEBPS");
+
+		self.book = book;
 
 		fs.root.addText('mimetype','application/epub+zip');
 
@@ -82,23 +103,9 @@
 		book.addBlob("title_page.xhtml",new Blob([Book.templates.title_page({title:self.title,author:self.author})],{type:"application/xhtml+xml"}));
 		book.addText("style.css",Book.templates.style);
 
-		for (var i = self.chapters.length - 1; i >= 0; i--) {
-			var chapterText = Book.templates.chapter({text:self.chapters[i],index:i+1});
-			// Basic XML Parser.
-			if(!!Book.config.validateXML){
-				if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
-					throw new Error("Book(): Invalid XHTML in chapters[" + i + "]");
-				}
-			}
-
-			book.addBlob("chap" + (i+1) + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
-		}
-
 		self._zip = fs;
 
-		if(!!self._done){
-			self._done(self);
-		}
+		callback();
 	};
 
 	Handlebars.registerHelper("chapter",function(index){
@@ -110,57 +117,83 @@
 	});
 
 	var Book = function(){
-		if(!(this instanceof Book)){
+		var self = this;
+
+		if(!(self instanceof Book)){
 			throw new Error("Book(): Function must be a new instance.");
 		}
 
 		if(Object.prototype.toString.call(arguments[0]) === "[object Object]"){
 			try {
-				this.title = arguments[0].title;
-				this.author = arguments[0].author;
+				self.title = arguments[0].title;
+				self.author = arguments[0].author;
 			} catch(e){}
 
 			if('language' in arguments[0]){
 				// TODO: Add a more advanced check.
 				if(/[a-z][a-z]-[A-Z][A-Z]/g.test(arguments[0].language)){
-					this.language = arguments[0].language;
+					self.language = arguments[0].language;
 				} else {
 					throw new Error("Book(): The language parameter must comply with RFC 3066 ex:en-US.");
 				}
 			} else {
-				this.language = 'en-US';
+				self.language = 'en-US';
 			}
 
-			if('chapters' in arguments[0]){
-				if(!isStringArray(arguments[0].chapters)){
-					throw new Error("Book(): The Array must contain only strings.");
-				}
-				this.chapters = arguments[0].chapters;
-			} else {
-				throw new Error("Book(): To create a book the parameter chapters of is required.");
-			}
+			self.chapters = [];
 		} else if(arguments[0] instanceof Array){
 			if(!isStringArray(arguments[0])){
 				throw new Error("Book(): The Array must contain only strings.");
 			}
-			this.chapters = arguments[0];
-			this.title = this.author = '';
+			self.chapters = arguments[0];
+			self.title = self.author = '';
 
 		} else {
 			throw new Error("Book(): First Argument must be an Object of Settings or an Array of Chapters.");
 		}
 
-		if(typeof(arguments[1]) == 'function'){
-			this._done = arguments[1];
-		}
+		/*if(typeof(arguments[1]) == 'function'){
+			self._done = arguments[1];
+		}*/
 
+		self._queue = new Queue();
 		// NOTE: Consider using an object instead of an array. 
-		loadTemplates(['content.opf','chapter.xhtml','title_page.xhtml'],['style.css'],loadFS.bind(this));
+		self._queue.push(loadTemplates.bind(self,['content.opf','chapter.xhtml','title_page.xhtml'],['style.css']));
+		self._queue.push(createZip.bind(self));
 	};
 
 	Book.prototype = {
 		exportBlob:function(callback){
-			this._zip.root.exportBlob(callback);
+			var self = this;
+			self._queue.push(function(){
+				self._zip.root.exportBlob(function(blob){
+					callback(blob.slice(0,blob.size,'application/epub+zip'));
+				});
+			});
+		},
+		addChapter:function(chapterText){
+			var self = this;
+			var _addChapter = function(chapterText,callback){
+				chapterText = Book.templates.chapter({text:chapterText,index:self.chapters.length});
+				// Basic XML Parser.
+				if(!!Book.config.validateXML){
+					if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
+						throw new Error("Book(): Invalid XHTML in chapters[" + self.chapters.length + "]");
+					}
+				}
+
+				self.book.addBlob("chap" + self.chapters.length + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
+				self.chapters.push(chapterText);
+
+				callback();
+			};
+
+			self._queue.push(_addChapter.bind(self,chapterText));
+		},
+		addChapters:function(chapters){
+			for (var i = 0; i < chapters.length; i++) {
+				this.addChapter(chapters[i]);
+			}
 		},
 		downloadBook:function(){
 			var self = this;
