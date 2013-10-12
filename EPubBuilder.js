@@ -9,6 +9,7 @@
 
 	// TODO: Add queueClean method.
 	// TODO: Add quick-book functionality.
+	// TODO: Add title functionality to addChapter method.
 
 	if('zip' in window){
 		// Works with inline script instead of workers to minimize dependencies, this may change later.
@@ -167,7 +168,7 @@
 
 				self.book.addBlob("chap" + chaptersAdded + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
 
-				chaptersAdded++;
+				chaptersAdded = chaptersAdded + 1;
 				
 				callback();
 			};
