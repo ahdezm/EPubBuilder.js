@@ -12,7 +12,7 @@
 
 	// TODO: Check for zip.js support.
 	// TODO: Add queueClean method.
-	
+
 	var isStringArray = function(array){
 		return array.filter(function(self){
 			return(typeof(self) !== 'string');
@@ -185,12 +185,6 @@
 			for (var i = 0; i < chapters.length; i++) {
 				this.addChapter(chapters[i]);
 			}
-		},
-		downloadBook:function(){
-			var self = this;
-			this._zip.root.exportBlob(function(blob){
-				window.saveAs(blob,self.title + ' - ' + self.author + '.epub');
-			});
 		}
 	};
 
