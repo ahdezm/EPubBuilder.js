@@ -154,8 +154,8 @@
 			});
 		},
 		addChapter:function(chapterText){
-			var self = this,
-				chaptersAdded = 1;
+			var self = this;
+			self.chaptersAdded = 1;
 
 			var _addChapter = function(chapterText,callback){
 				chapterText = Book.templates.chapter({text:chapterText,index:chaptersAdded});
