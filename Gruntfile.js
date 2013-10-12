@@ -22,11 +22,6 @@ module.exports = function(grunt) {
 				files:{
 					'EPubBuilder.min.js':['EPubBuilder.js']
 				}
-			},
-			template:{
-				files:{
-					'template.json':['template.json']
-				}
 			}
 		},
 		compileJSON: {
@@ -38,7 +33,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-connect');
-	
+
 	grunt.loadTasks('grunt-tasks');
 
 	grunt.registerTask('server', ['connect','watch']);

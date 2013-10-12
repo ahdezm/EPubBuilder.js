@@ -7,11 +7,15 @@
 	},function(book){ @callback });
 	*/
 
-	// Works with inline script instead of workers to minimize dependencies, this may change later.
-	zip.useWebWorkers = false;
-
-	// TODO: Check for zip.js support.
 	// TODO: Add queueClean method.
+	// TODO: Add quick-book functionality.
+
+	if('zip' in window){
+		// Works with inline script instead of workers to minimize dependencies, this may change later.
+		zip.useWebWorkers = false;
+	} else {
+		throw new Error("Book(): zip.js is a dependency of EPubBuilder.js");
+	}
 
 	var isStringArray = function(array){
 		return array.filter(function(self){
@@ -130,25 +134,11 @@
 			} else {
 				self.language = 'en-US';
 			}
-
-			self.chapters = [];
-		} else if(arguments[0] instanceof Array){
-			if(!isStringArray(arguments[0])){
-				throw new Error("Book(): The Array must contain only strings.");
-			}
-			self.chapters = arguments[0];
-			self.title = self.author = '';
-
 		} else {
-			throw new Error("Book(): First Argument must be an Object of Settings or an Array of Chapters.");
+			throw new Error("Book(): First Argument must be an Object of Settings.");
 		}
 
-		/*if(typeof(arguments[1]) == 'function'){
-			self._done = arguments[1];
-		}*/
-
 		self._queue = new Queue();
-		// NOTE: Consider using an object instead of an array. 
 		self._queue.push(loadTemplates);
 		self._queue.push(createZip.bind(self));
 	};
@@ -163,9 +153,11 @@
 			});
 		},
 		addChapter:function(chapterText){
-			var self = this;
+			var self = this,
+				chaptersAdded = 1;
+
 			var _addChapter = function(chapterText,callback){
-				chapterText = Book.templates.chapter({text:chapterText,index:self.chapters.length});
+				chapterText = Book.templates.chapter({text:chapterText,index:chaptersAdded});
 				// Basic XML Parser.
 				if(!!Book.config.validateXML){
 					if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
@@ -173,9 +165,10 @@
 					}
 				}
 
-				self.book.addBlob("chap" + self.chapters.length + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
-				self.chapters.push(chapterText);
+				self.book.addBlob("chap" + chaptersAdded + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
 
+				chaptersAdded++;
+				
 				callback();
 			};
 
