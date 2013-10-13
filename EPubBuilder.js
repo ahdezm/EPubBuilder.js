@@ -10,6 +10,7 @@
 	// TODO: Add queueClean method.
 	// TODO: Add quick-book functionality.
 	// TODO: Add title functionality to addChapter method.
+	// TODO: Add index input to addChapter.
 
 	if('zip' in window){
 		// Works with inline script instead of workers to minimize dependencies, this may change later.
@@ -87,26 +88,31 @@
 
 		meta.addBlob('container.xml',new Blob(['<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'],{type:'application/xml'}));
 
-		book.addBlob('content.opf',new Blob([Book.templates.content({
-			title:self.title,
-			author:self.author,
-			chapters:self.chapters,
-			lang:self.language,
-			// UUID Random Generator.
-			uuid:'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);})
-		})],{type:"application/oebps-package+xml"}));
-
 		book.addBlob("title_page.xhtml",new Blob([Book.templates.title_page({title:self.title,author:self.author})],{type:"application/xhtml+xml"}));
 		book.addText("style.css",Book.templates.style);
 
+		self.book.chaptersAdded = 1;
 		self._zip = fs;
 
 		callback();
 	};
+	var finishBook = function(callback){
+		var chapterIndexArray = [];
+		for (var i = 1; i <= this.book.chaptersAdded; i++) {
+			chapterIndexArray.push(i);
+		}
 
-	Handlebars.registerHelper("chapter",function(index){
-		return parseInt(index,10) + 1;
-	});
+		this.book.addBlob('content.opf',new Blob([Book.templates.content({
+			title:this.title,
+			author:this.author,
+			chapters:chapterIndexArray,
+			lang:this.language,
+			// UUID Random Generator.
+			uuid:'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);})
+		})],{type:"application/oebps-package+xml"}));
+
+		callback();
+	};
 
 	Handlebars.registerHelper("html",function(html){
 		return new Handlebars.SafeString(html);
@@ -147,18 +153,30 @@
 	Book.prototype = {
 		exportBlob:function(callback){
 			var self = this;
+
+			self._queue.push(finishBook.bind(self));
 			self._queue.push(function(){
 				self._zip.root.exportBlob(function(blob){
 					callback(blob.slice(0,blob.size,'application/epub+zip'));
 				});
 			});
 		},
-		addChapter:function(chapterText){
-			var self = this;
-			self.chaptersAdded = 1;
+		addChapter:function(a,b){
+			// a -> index b -> chapterText
+			var self = this,args = arguments;
 
-			var _addChapter = function(chapterText,callback){
-				chapterText = Book.templates.chapter({text:chapterText,index:chaptersAdded});
+			var _addChapter = function(callback){
+				var index,chapterText;
+
+				if(args.length < 2){
+					chapterText = a;
+					index = self.book.chaptersAdded;
+				} else {
+					index = a;
+					chapterText = b;
+				}
+
+				chapterText = Book.templates.chapter({text:chapterText,index:index});
 				// Basic XML Parser.
 				if(!!Book.config.validateXML){
 					if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
@@ -166,14 +184,15 @@
 					}
 				}
 
-				self.book.addBlob("chap" + chaptersAdded + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
+				self.book.addBlob("chap" + index + ".xhtml",new Blob([chapterText],{type:"application/xhtml+xml"}));
 
-				chaptersAdded = chaptersAdded + 1;
+				// For content.opf file creation.
+				self.book.chaptersAdded++;
 				
 				callback();
 			};
 
-			self._queue.push(_addChapter.bind(self,chapterText));
+			self._queue.push(_addChapter);
 		},
 		addChapters:function(chapters){
 			for (var i = 0; i < chapters.length; i++) {

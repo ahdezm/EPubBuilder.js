@@ -12,13 +12,13 @@
 		<item id="style" href="style.css" media-type="text/css" />
 		<item id="titlepage" href="title_page.xhtml" media-type="application/xhtml+xml" />
 		{{#each chapters}}
-		<item id="chapter{{chapter @index}}" href="chap{{chapter @index}}.xhtml" media-type="application/xhtml+xml" />
+		<item id="chapter{{ this }}" href="chap{{ this }}.xhtml" media-type="application/xhtml+xml" />
 		{{/each}}
 	</manifest>
 	<spine toc="ncx">
 		<itemref idref="titlepage"/>
 		{{#each chapters}}
-		<itemref idref="chapter{{chapter @index}}"/>
+		<itemref idref="chapter{{ this }}"/>
 		{{/each}}
 	</spine>
 </package>
