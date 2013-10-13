@@ -9,8 +9,7 @@
 
 	// TODO: Add queueClean method.
 	// TODO: Add quick-book functionality.
-	// TODO: Add title functionality to addChapter method.
-	// TODO: Add index input to addChapter.
+	// TODO: Add object instead of index to addChapter method.
 
 	if('zip' in window){
 		// Works with inline script instead of workers to minimize dependencies, this may change later.
@@ -168,12 +167,12 @@
 			var _addChapter = function(callback){
 				var index,chapterText;
 
-				if(args.length < 2){
-					chapterText = a;
-					index = self.book.chaptersAdded;
+				if(args.length === 2){
+					index = (!isNaN(parseFloat(a)) && isFinite(a))?(a):(self.book.chaptersAdded);
+					chapterText = b.toString();
 				} else {
-					index = a;
-					chapterText = b;
+					chapterText = a.toString();
+					index = self.book.chaptersAdded;
 				}
 
 				chapterText = Book.templates.chapter({text:chapterText,index:index});
