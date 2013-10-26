@@ -33,12 +33,13 @@
 			}
 		};
 		
-		new ArrayObserver(queue,function(splices){
-			if(queue.length > 0 && queue.length - splices[0].addedCount === 0){
-				queue[0](taskCallback);
+		queue.push = function(task){
+			Array.prototype.push.call(this,task);
+			if(this.length === 1){
+				this[0](taskCallback);
 			}
-		});
-		
+		};
+
 		return queue;
 	};
 
@@ -154,10 +155,12 @@
 			var self = this;
 
 			self._queue.push(finishBook.bind(self));
-			self._queue.push(function(){
+			self._queue.push(function(done){
 				self._zip.root.exportBlob(function(blob){
 					callback(blob.slice(0,blob.size,'application/epub+zip'));
 				});
+				
+				done();
 			});
 		},
 		addChapter:function(a,b){

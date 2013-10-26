@@ -16,7 +16,6 @@
   ],
   "dependencies": {
     "handlebars": "~1.0.0",
-    "zip.js": "gildas-lormeau/zip.js",
-    "observe.js":"Polymer/observe-js"
+    "zip.js": "gildas-lormeau/zip.js"
   }
 }
