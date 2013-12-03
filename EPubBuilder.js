@@ -182,7 +182,7 @@
 				// Basic XML Parser.
 				if(!!Book.config.validateXML){
 					if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
-						throw new Error("Book(): Invalid XHTML in chapters[" + self.chapters.length + "]");
+						throw new Error("Book(): Invalid XHTML in chapter " + index);
 					}
 				}
 

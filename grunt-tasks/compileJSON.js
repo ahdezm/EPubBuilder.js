@@ -1,3 +1,6 @@
+var pd = require('pretty-data').pd;
+var Path = require('path');
+
 module.exports = function(grunt){
 	grunt.registerTask("compileJSON","Compile template.json file",function(){
 		grunt.config.requires(['compileJSON','path'],['compileJSON','dest']);
@@ -11,10 +14,20 @@ module.exports = function(grunt){
 		}
 
 		grunt.file.recurse(path,function(abspath,rootdir,subdir,filename){
-			filename = filename.slice(0,(filename.indexOf(".") > 0)?filename.indexOf("."):filename.length-1);
-			result[filename] = grunt.file.read(abspath);
+			var ext = Path.extname(filename);
+			var name = Path.basename(filename,ext);
+			var data = grunt.file.read(abspath);
+
+			// Consider using replace to strip whitespace.
+			if(['.xhtml','.opf','.ncx'].indexOf(ext) > 0){
+				data = pd.xmlmin(data);
+			} else if(ext === '.css'){
+				data = pd.cssmin(data);
+			}
+
+			result[name] = grunt.file.read(abspath);
 		});
 
-		grunt.file.write(dest,JSON.stringify(result));
+		grunt.file.write(dest,pd.jsonmin(JSON.stringify(result)));
 	});
 };
