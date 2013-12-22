@@ -8,8 +8,11 @@
 	*/
 
 	// TODO: Add queueClean method.
+	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
 	// TODO: Add object instead of index to addChapter method.
+	// TODO: Use JS Promises instead of callbacks.
+	// TODO: Load templates.js before execute.
 
 	if('zip' in window){
 		// Works with inline script instead of workers to minimize dependencies, this may change later.
@@ -49,28 +52,14 @@
 			return;
 		}
 
-		var xhr = new XMLHttpRequest();
-		xhr.responseType = 'text';
-		xhr.open("GET",Book.config.templateJSON,true);
-		xhr.send();
+		var script = document.createElement('script');
+		script.src = Book.config.templateJS;
+		script.type = 'text/javascript';
+		document.body.appendChild(script);
 
-		xhr.onload = function(){
-			if(this.status == '200'){
-				try {
-					Book.templates = JSON.parse(this.response);
-				} catch(e){
-					throw new Error("Book() loadJSON: Uable to parse " + Book.config.templateJSON + ' JSON file.');
-				}
-				for(var file in Book.templates){
-					if(Book.config.templateCompile.indexOf(file) > -1){
-						Book.templates[file] = Handlebars.compile(Book.templates[file]);
-					}
-				}
-				done();
-				
-			} else {
-				var error = new Error("Book() loadJSON: Could not load JSON template file from path ",Book.config.templateJSON);
-			}
+		script.onload = done;
+		script.onerror = function(){
+			throw new Error("Book(): Template file could not be loaded correctly from path: " + Book.config.templateJS);
 		};
 	};
 
@@ -97,6 +86,7 @@
 		callback();
 	};
 	var finishBook = function(callback){
+		// TODO: This can only happen once or rewrite
 		var chapterIndexArray = [];
 		for (var i = 1; i <= this.book.chaptersAdded; i++) {
 			chapterIndexArray.push(i);
@@ -207,7 +197,7 @@
 	Book.config = {};
 	Book.templates = {};
 
-	Book.config.templateJSON = "template.json";
+	Book.config.templateJS = "templates.js";
 	Book.config.templateCompile = ['content','chapter','title_page'];
 	Book.config.validateXML = true;
 
