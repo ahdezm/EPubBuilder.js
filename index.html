@@ -10,6 +10,7 @@
 <script src="libs/zip.js/WebContent/zip-fs.js"></script>
 <script src="libs/zip.js/WebContent/deflate-blob.js"></script>
 <script src="libs/queue-async/queue.js"></script>
+<script src="templates.js"></script>
 <!-- Dependencies End -->
 <script src="EPubBuilder.js"></script>
 
@@ -29,6 +30,7 @@
 		console.profileEnd("newBook");
 		window.performance.mark("endBook");
 		window.performance.measure("totalBook","startBook","endBook");
+
 		console.log(window.URL.createObjectURL(blob));
 		console.log(window.performance.getEntriesByName("totalBook")[0]);
 	});

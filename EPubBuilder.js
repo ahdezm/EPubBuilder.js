@@ -13,7 +13,7 @@
 	// TODO: Add queueClean method.
 	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
-	// TODO: Add object instead of index to addChapter method.
+	// TODO: Use object instead of index to addChapter method.
 	// TODO: Use JS Promises instead of callbacks.
 	// TODO: Load templates.js before execute.
 	// TODO: Add node-style callbacks
@@ -132,7 +132,7 @@
 		}
 
 		self._queue = new queue(1);
-		self._queue.defer(loadTemplates);
+		//self._queue.defer(loadTemplates);
 		self._queue.defer(createZip.bind(self));
 	};
 
@@ -199,6 +199,7 @@
 	// To prevent changes to config.
 	Object.preventExtensions(Book.config);
 
+	Book.templates = window.Book.templates;
 	window.Book = Book;
 
 })(this);
