@@ -1,4 +1,4 @@
-/* global zip, Handlebars */
+/* global zip, Handlebars, queue */
 
 (function(window,undefined){
 	"use strict";
@@ -32,28 +32,9 @@
 		}).length < 1;
 	};
 
-	var Queue = function(){
-		var queue = [];
-		var taskCallback = function(){
-			queue.shift();
-			if(queue.length > 0){
-				queue[0](taskCallback);
-			}
-		};
-		
-		queue.push = function(task){
-			Array.prototype.push.call(this,task);
-			if(this.length === 1){
-				this[0](taskCallback);
-			}
-		};
-
-		return queue;
-	};
-
 	var loadTemplates = function(done){
 		if(Object.keys(Book.templates).length > 0){
-			done();
+			done(null);
 			return;
 		}
 
@@ -62,13 +43,15 @@
 		script.type = "text/javascript";
 		document.body.appendChild(script);
 
-		script.onload = done;
+		script.onload = function(){
+			done();
+		};
 		script.onerror = function(){
 			throw new Error("Book(): Template file could not be loaded correctly from path: " + Book.config.templateJS);
 		};
 	};
 
-	var createZip = function(callback){
+	var createZip = function(done){
 		// TODO: Add Error callback to Filesystem API.
 		var self =  this;
 		var fs = new zip.fs.FS();
@@ -88,9 +71,9 @@
 		self.book.chaptersAdded = 1;
 		self._zip = fs;
 
-		callback();
+		done();
 	};
-	var finishBook = function(callback){
+	var finishBook = function(done){
 		// TODO: This can only happen once or rewrite
 		var chapterIndexArray = [];
 		for (var i = 1; i <= this.book.chaptersAdded; i++) {
@@ -106,7 +89,7 @@
 			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
 		})],{type:"application/oebps-package+xml"}));
 
-		callback();
+		done();
 	};
 
 	Handlebars.registerHelper("html",function(html){
@@ -139,21 +122,20 @@
 			throw new Error("Book(): First Argument must be an Object of Settings.");
 		}
 
-		self._queue = new Queue();
-		self._queue.push(loadTemplates);
-		self._queue.push(createZip.bind(self));
+		self._queue = new queue(1);
+		self._queue.defer(loadTemplates);
+		self._queue.defer(createZip.bind(self));
 	};
 
 	Book.prototype = {
 		exportBlob:function(callback){
 			var self = this;
 
-			self._queue.push(finishBook.bind(self));
-			self._queue.push(function(done){
+			self._queue.defer(finishBook.bind(self));
+			self._queue.defer(function(done){
 				self._zip.root.exportBlob(function(blob){
 					callback(blob.slice(0,blob.size,"application/epub+zip"));
 				});
-				
 				done();
 			});
 		},
@@ -161,7 +143,7 @@
 			// a -> index b -> chapterText
 			var self = this,args = arguments;
 
-			var _addChapter = function(callback){
+			var _addChapter = function(done){
 				var index,chapterText;
 
 				if(args.length === 2){
@@ -185,10 +167,10 @@
 				// For content.opf file creation.
 				self.book.chaptersAdded++;
 				
-				callback();
+				done();
 			};
 
-			self._queue.push(_addChapter);
+			self._queue.defer(_addChapter);
 		},
 		addChapters:function(chapters){
 			for (var i = 0; i < chapters.length; i++) {
