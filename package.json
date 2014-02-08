@@ -22,7 +22,6 @@
     "gulp-handlebars": "~1.0.1",
     "gulp-declare": "0.0.1",
     "gulp-concat": "~2.1.7",
-    "gulp-util": "~2.2.14",
-    "gulp-connect": "~0.3.1"
+    "gulp-util": "~2.2.14"
   }
 }

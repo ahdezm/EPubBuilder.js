@@ -5,7 +5,6 @@ var gutil = require("gulp-util");
 var uglify = require("gulp-uglify");
 var rename = require("gulp-rename");
 var concat = require("gulp-concat");
-var connect = require("gulp-connect");
 
 var hbs = require("gulp-handlebars");
 var declare = require("gulp-declare");
@@ -36,9 +35,3 @@ gulp.task("hbs",function(){
 		//.pipe(uglify())
 		.pipe(gulp.dest("./"));
 });
-
-gulp.task("connect", connect.server({
-	root: __dirname + "/",
-	port: 1337,
-	livereload: true
-}));

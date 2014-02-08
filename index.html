@@ -14,18 +14,23 @@
 <script src="EPubBuilder.js"></script>
 
 <script>
-	performance.mark("startBook");
+	/* jshint indent:false */
+	/* global Book */
+
+	window.performance.mark("startBook");
+
 	var book = new Book({
 		title:"Finding Nemo",
 		author:"Nemo's Father",
 	});
 	book.addChapter("Hello");
 	book.exportBlob(function(blob){
-		performance.mark("endBook");
-		performance.measure('totalBook','startBook','endBook');
-		console.log(URL.createObjectURL(blob));
-		console.log(performance.getEntriesByName('totalBook')[0]);
+		window.performance.mark("endBook");
+		window.performance.measure("totalBook","startBook","endBook");
+		console.log(window.URL.createObjectURL(blob));
+		console.log(window.performance.getEntriesByName("totalBook")[0]);
 	});
+
 </script>
 </body>
 </html>

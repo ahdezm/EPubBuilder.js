@@ -82,8 +82,5 @@
 	"white"         : false,    // true: Check against strict whitespace and indentation rules
 
 	// Custom Globals
-	"globals"       : { // additional predefined global variables
-		"zip":false,
-		"Handlebars":false
-	}        
+	"globals"       : {}        // additional predefined global variables
 }

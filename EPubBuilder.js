@@ -1,3 +1,5 @@
+/* global zip, Handlebars */
+
 (function(window,undefined){
 	"use strict";
 	/*
