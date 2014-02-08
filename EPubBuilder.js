@@ -40,6 +40,7 @@
 
 		var script = document.createElement("script");
 		script.src = Book.config.templateJS;
+		script.async = true;
 		script.type = "text/javascript";
 		document.body.appendChild(script);
 
@@ -66,7 +67,7 @@
 		meta.addBlob("container.xml",new Blob(["<?xml version=\"1.0\"?><container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\"><rootfiles><rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/></rootfiles></container>"],{type:"application/xml"}));
 
 		book.addBlob("title_page.xhtml",new Blob([Book.templates.title_page({title:self.title,author:self.author})],{type:"application/xhtml+xml"}));
-		book.addText("style.css",Book.templates.style);
+		book.addText("style.css",Book.templates.style());
 
 		self.book.chaptersAdded = 1;
 		self._zip = fs;
@@ -79,15 +80,23 @@
 		for (var i = 1; i <= this.book.chaptersAdded; i++) {
 			chapterIndexArray.push(i);
 		}
-
-		this.book.addBlob("content.opf",new Blob([Book.templates.content({
+		var blobData = new Blob([Book.templates.content({
 			title:this.title,
 			author:this.author,
 			chapters:chapterIndexArray,
 			lang:this.language,
 			// UUID Random Generator.
 			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
-		})],{type:"application/oebps-package+xml"}));
+		})],{type:"application/oebps-package+xml"});
+
+		var file = this.book.getChildByName("content.opf")
+
+		if(!!file){
+			file.data = blobData;
+		} else {
+			this.book.addBlob("content.opf",blobData);
+		}
+		
 
 		done();
 	};

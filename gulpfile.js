@@ -10,6 +10,8 @@ var hbs = require("gulp-handlebars");
 var declare = require("gulp-declare");
 
 var path = require("path");
+var http = require("http");
+var fs = require("fs");
 
 gulp.task("compress",function(){
 	gulp.src("EPubBuilder.js")
@@ -34,4 +36,28 @@ gulp.task("hbs",function(){
 		.pipe(concat("templates.js"))
 		//.pipe(uglify())
 		.pipe(gulp.dest("./"));
+});
+
+gulp.task("timing",function(done){
+	var server = http.createServer(function(req,res){
+		var file = fs.createWriteStream("timing.txt",{
+			flags:"a",
+			encoding:"utf-8"
+		});
+
+		req.pipe(file,{
+			end:false
+		});
+
+		req.on("end",function(){
+			file.end("\n");
+
+			res.setHeader("Access-Control-Allow-Origin","*");
+			res.end();
+		});
+	})
+
+	server.on("close",done);
+
+	server.listen(1338);
 });
