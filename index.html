@@ -9,20 +9,22 @@
 <script src="libs/FileSaver/FileSaver.js"></script>
 <script src="libs/zip.js/WebContent/zip.js"></script>
 <script src="libs/zip.js/WebContent/zip-fs.js"></script>
-<script src="libs/zip.js/WebContent/deflate.js"></script>
+<script src="libs/zip.js/WebContent/deflate-blob.js"></script>
 <!-- Dependencies End -->
 <script src="EPubBuilder.js"></script>
 
 <script>
-	console.time("newBook");
+	performance.mark("startBook");
 	var book = new Book({
 		title:"Finding Nemo",
 		author:"Nemo's Father",
 	});
 	book.addChapter("Hello");
 	book.exportBlob(function(blob){
-		console.timeEnd("newBook");
-		console.log(blob)
+		performance.mark("endBook");
+		performance.measure('totalBook','startBook','endBook');
+		console.log(URL.createObjectURL(blob));
+		console.log(performance.getEntriesByName('totalBook')[0]);
 	});
 </script>
 </body>

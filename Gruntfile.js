@@ -38,13 +38,13 @@ module.exports = function(grunt) {
 					namespace:'Book.templates',
 				},
 				files:{
-					'templates.js':['templates/*']
+					'templates_grunt.js':['templates/*']
 				}
 			}
 		}
 	});
 
-	require('load-grunt-tasks')(grunt);
+	grunt.loadNpmTasks('grunt-contrib-handlebars');
 
 	grunt.registerTask('server', ['connect','watch']);
 	grunt.registerTask('template', ['handlebars','uglify:hbs']);

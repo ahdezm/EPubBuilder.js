@@ -40,9 +40,9 @@
 
 	var INFLATE_JS = "inflate.js";
 	var DEFLATE_JS = "deflate.js";
-	
+
 	var TEXT_PLAIN = "text/plain";
-	
+
 	var MESSAGE_EVENT = "message";
 
 	var appendABViewSupported;
@@ -393,7 +393,11 @@
 		}
 
 		if (obj.zip.useWebWorkers) {
-			worker = new Worker(obj.zip.workerScriptsPath + INFLATE_JS);
+            if (obj.zip.useWebWorkerBlobs) {
+			    worker = new Worker(obj.zip.inflateWorkerBlob);
+            } else {
+                worker = new Worker(obj.zip.workerScriptsPath + INFLATE_JS);
+            }
 			launchWorkerProcess(worker, reader, writer, offset, size, oninflateappend, onprogress, oninflateend, onreaderror, onwriteerror);
 		} else
 			launchProcess(new obj.zip.Inflater(), reader, writer, offset, size, oninflateappend, onprogress, oninflateend, onreaderror, onwriteerror);
@@ -418,7 +422,11 @@
 		}
 
 		if (obj.zip.useWebWorkers) {
-			worker = new Worker(obj.zip.workerScriptsPath + DEFLATE_JS);
+            if (obj.zip.useWebWorkerBlobs) {
+			    worker = new Worker(obj.zip.deflateWorkerBlob);
+            } else {
+			    worker = new Worker(obj.zip.workerScriptsPath + DEFLATE_JS);
+            }
 			worker.addEventListener(MESSAGE_EVENT, onmessage, false);
 			worker.postMessage({
 				init : true,
@@ -795,7 +803,10 @@
 			}, onerror);
 		},
 		workerScriptsPath : "",
-		useWebWorkers : true
+		useWebWorkers : true,
+        useWebWorkerBlobs : false,
+        inflateWorkerBlob : null,
+        deflateWorkerBlob : null
 	};
 
 })(this);

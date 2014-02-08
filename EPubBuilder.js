@@ -13,10 +13,12 @@
 	// TODO: Add object instead of index to addChapter method.
 	// TODO: Use JS Promises instead of callbacks.
 	// TODO: Load templates.js before execute.
+	// TODO: Add node-style callbacks
 
 	if('zip' in window){
 		// Works with inline script instead of workers to minimize dependencies, this may change later.
-		zip.useWebWorkers = false;
+		zip.useWebWorkers = true;
+		zip.useWebWorkerBlobs = true;
 	} else {
 		throw new Error("Book(): zip.js is a dependency of EPubBuilder.js");
 	}
@@ -116,10 +118,9 @@
 		}
 
 		if(Object.prototype.toString.call(arguments[0]) === "[object Object]"){
-			try {
-				self.title = arguments[0].title;
-				self.author = arguments[0].author;
-			} catch(e){}
+			
+			self.title = arguments[0].title || '';
+			self.author = arguments[0].author || '';
 
 			if('language' in arguments[0]){
 				// TODO: Add a more advanced check.
