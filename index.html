@@ -19,7 +19,6 @@
 	/* global Book */
 
 	window.performance.mark("startBook");
-	console.profile("newBook");
 
 	var book = new Book({
 		title:"Finding Nemo",
@@ -27,7 +26,6 @@
 	});
 	book.addChapter("Hello");
 	book.exportBlob(function(blob){
-		console.profileEnd("newBook");
 		window.performance.mark("endBook");
 		window.performance.measure("totalBook","startBook","endBook");
 
