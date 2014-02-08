@@ -1,4 +1,5 @@
 (function(window,undefined){
+	"use strict";
 	/*
 	new Book({
 		title:title,
@@ -15,7 +16,7 @@
 	// TODO: Load templates.js before execute.
 	// TODO: Add node-style callbacks
 
-	if('zip' in window){
+	if("zip" in window){
 		// Works with inline script instead of workers to minimize dependencies, this may change later.
 		zip.useWebWorkers = true;
 		zip.useWebWorkerBlobs = true;
@@ -25,7 +26,7 @@
 
 	var isStringArray = function(array){
 		return array.filter(function(self){
-			return(typeof(self) !== 'string');
+			return(typeof(self) !== "string");
 		}).length < 1;
 	};
 
@@ -54,9 +55,9 @@
 			return;
 		}
 
-		var script = document.createElement('script');
+		var script = document.createElement("script");
 		script.src = Book.config.templateJS;
-		script.type = 'text/javascript';
+		script.type = "text/javascript";
 		document.body.appendChild(script);
 
 		script.onload = done;
@@ -75,9 +76,9 @@
 
 		self.book = book;
 
-		fs.root.addText('mimetype','application/epub+zip');
+		fs.root.addText("mimetype","application/epub+zip");
 
-		meta.addBlob('container.xml',new Blob(['<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'],{type:'application/xml'}));
+		meta.addBlob("container.xml",new Blob(["<?xml version=\"1.0\"?><container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\"><rootfiles><rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/></rootfiles></container>"],{type:"application/xml"}));
 
 		book.addBlob("title_page.xhtml",new Blob([Book.templates.title_page({title:self.title,author:self.author})],{type:"application/xhtml+xml"}));
 		book.addText("style.css",Book.templates.style);
@@ -94,13 +95,13 @@
 			chapterIndexArray.push(i);
 		}
 
-		this.book.addBlob('content.opf',new Blob([Book.templates.content({
+		this.book.addBlob("content.opf",new Blob([Book.templates.content({
 			title:this.title,
 			author:this.author,
 			chapters:chapterIndexArray,
 			lang:this.language,
 			// UUID Random Generator.
-			uuid:'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);})
+			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
 		})],{type:"application/oebps-package+xml"}));
 
 		callback();
@@ -119,10 +120,10 @@
 
 		if(Object.prototype.toString.call(arguments[0]) === "[object Object]"){
 			
-			self.title = arguments[0].title || '';
-			self.author = arguments[0].author || '';
+			self.title = arguments[0].title || "";
+			self.author = arguments[0].author || "";
 
-			if('language' in arguments[0]){
+			if("language" in arguments[0]){
 				// TODO: Add a more advanced check.
 				if(/[a-z][a-z]-[A-Z][A-Z]/g.test(arguments[0].language)){
 					self.language = arguments[0].language;
@@ -130,7 +131,7 @@
 					throw new Error("Book(): The language parameter must comply with RFC 3066 ex:en-US.");
 				}
 			} else {
-				self.language = 'en-US';
+				self.language = "en-US";
 			}
 		} else {
 			throw new Error("Book(): First Argument must be an Object of Settings.");
@@ -148,7 +149,7 @@
 			self._queue.push(finishBook.bind(self));
 			self._queue.push(function(done){
 				self._zip.root.exportBlob(function(blob){
-					callback(blob.slice(0,blob.size,'application/epub+zip'));
+					callback(blob.slice(0,blob.size,"application/epub+zip"));
 				});
 				
 				done();
@@ -199,7 +200,7 @@
 	Book.templates = {};
 
 	Book.config.templateJS = "templates.js";
-	Book.config.templateCompile = ['content','chapter','title_page'];
+	Book.config.templateCompile = ["content","chapter","title_page"];
 	Book.config.validateXML = true;
 
 	// To prevent changes to config.
