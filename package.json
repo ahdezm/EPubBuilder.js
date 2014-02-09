@@ -15,7 +15,6 @@
   "author": "polikis",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "mocha-phantomjs": "~3.3.1",
     "gulp": "~3.5.1",
     "gulp-uglify": "~0.2.0",
     "gulp-rename": "~0.2.2",

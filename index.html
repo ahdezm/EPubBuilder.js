@@ -18,16 +18,30 @@
 	/* jshint indent:false */
 	/* global Book */
 
+	// TODO: Add true benchmarking http://benchmarkjs.com/
+	/*function sendToServer(time){
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST','http://localhost:1338');
+		xhr.onload = function(){
+			if(Boolean(this.response)){
+				window.location.reload();
+			}	
+		};
+		xhr.send(time);
+	};*/
+
 	window.performance.mark("startBook");
-	console.profile("newBook");
+	//console.profile("newBook");
 
 	var book = new Book({
 		title:"Finding Nemo",
 		author:"Nemo's Father",
 	});
+
 	book.addChapter("Hello");
-	book.exportBlob(function(blob){
-		console.profileEnd("newBook");
+
+	book.exportBlob().then(function(blob){
+		//console.profileEnd("newBook");
 		window.performance.mark("endBook");
 		window.performance.measure("totalBook","startBook","endBook");
 

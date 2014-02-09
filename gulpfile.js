@@ -39,25 +39,31 @@ gulp.task("hbs",function(){
 });
 
 gulp.task("timing",function(done){
-	var server = http.createServer(function(req,res){
-		var file = fs.createWriteStream("timing.txt",{
-			flags:"a",
-			encoding:"utf-8"
-		});
+	var file = fs.createWriteStream("timing.txt",{
+		flags:"a",
+		encoding:"utf-8"
+	});
 
+	var i = 0;
+	var server = http.createServer(function(req,res){
 		req.pipe(file,{
 			end:false
 		});
 
 		req.on("end",function(){
-			file.end("\n");
+			file.write("\n");
 
 			res.setHeader("Access-Control-Allow-Origin","*");
+			if(i < 100){
+				res.write("true");
+			} else {
+				done();
+			}
 			res.end();
 		});
-	})
-
-	server.on("close",done);
+		process.stdout.write("\r"+i+"/100");
+		i++;
+	});
 
 	server.listen(1338);
 });
