@@ -17,6 +17,6 @@
   "dependencies": {
     "handlebars": "~1.3.0",
     "zip.js": "kankje/zip.js",
-    "queue-async": "~1.0.7"
+    "rsvp": "~3.0.1"
   }
 }
