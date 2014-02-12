@@ -10,13 +10,12 @@
 	},function(book){ @callback });
 	*/
 
-	// TODO: Add queueClean method.
 	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
 	// TODO: Use object instead of index to addChapter method.
 	// TODO: Use JS Promises instead of callbacks.
-	// TODO: Load templates.js before execute.
 	// TODO: Add node-style callbacks
+	// TODO: Define Hidden Class beforehand
 
 	var Promise = window.Promise || RSVP.Promise;
 
@@ -44,35 +43,38 @@
 
 		fs.root.addText("mimetype","application/epub+zip");
 
-		meta.addBlob("container.xml",new Blob(["<?xml version=\"1.0\"?><container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\"><rootfiles><rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/></rootfiles></container>"],{type:"application/xml"}));
+		meta.addText("container.xml",Book.templates.container());
 
-		book.addBlob("title_page.xhtml",new Blob([Book.templates.title_page({title:self.title,author:self.author})],{type:"application/xhtml+xml"}));
+		book.addText("title_page.xhtml",Book.templates.title_page({
+			title:self.title,
+			author:self.author
+		}));
+
 		book.addText("style.css",Book.templates.style());
 
 		self.book.chaptersAdded = 1;
 		self._zip = fs;
 	};
 	var finishBook = function(){
-		// TODO: This can only happen once or rewrite
 		var chapterIndexArray = [];
 		for (var i = 1; i <= this.book.chaptersAdded; i++) {
 			chapterIndexArray.push(i);
 		}
-		var blobData = new Blob([Book.templates.content({
+		var blobData = Book.templates.content({
 			title:this.title,
 			author:this.author,
 			chapters:chapterIndexArray,
 			lang:this.language,
 			// UUID Random Generator.
 			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
-		})],{type:"application/oebps-package+xml"});
+		});
 
 		var file = this.book.getChildByName("content.opf");
 
 		if(!!file){
 			file.data = blobData;
 		} else {
-			this.book.addBlob("content.opf",blobData);
+			this.book.addText("content.opf",blobData);
 		}
 	};
 
@@ -108,19 +110,19 @@
 
 		self._queue = Promise.resolve();
 		//self._queue.defer(loadTemplates);
-		self._queue = self._queue.then(createZip.bind(self));
+		self._queue = self._queue.then(createZip.bind(self)).catch(handleError);
 	};
 
 	Book.prototype = {
-		exportBlob:function(){
+		exportBlob:function(done){
 			var self = this;
 			self._queue = self._queue.then(finishBook.bind(self));
 			
-			return new Promise(function(resolve,reject){
-				self._queue = self._queue.then(function(){
-					self._zip.root.exportBlob(function(blob){
-						resolve(blob.slice(0,blob.size,"application/epub+zip"));
-					},null,reject);
+			self._queue = self._queue.then(function(){
+				self._zip.root.exportBlob(function(blob){
+					done(null,blob.slice(0,blob.size,"application/epub+zip"));
+				},null,function(error){
+					done(error);
 				});
 			});
 			
@@ -149,12 +151,11 @@
 					}
 				}
 
-				self.book.addBlob("chap" + index + ".xhtml", new Blob([chapterText],{type:"application/xhtml+xml"}));
+				self.book.addText("chap" + index + ".xhtml",chapterText);
 
 				// For content.opf file creation.
 				self.book.chaptersAdded++;
 			};
-			
 
 			self._queue = self._queue.then(_addChapter);
 		},

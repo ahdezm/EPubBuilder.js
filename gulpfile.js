@@ -5,6 +5,7 @@ var gutil = require("gulp-util");
 var uglify = require("gulp-uglify");
 var rename = require("gulp-rename");
 var concat = require("gulp-concat");
+var es = require("event-stream");
 
 var hbs = require("gulp-handlebars");
 var declare = require("gulp-declare");
@@ -12,6 +13,8 @@ var declare = require("gulp-declare");
 var path = require("path");
 var http = require("http");
 var fs = require("fs");
+
+var xmlEncoding = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
 gulp.task("compress",function(){
 	gulp.src("EPubBuilder.js")
@@ -22,7 +25,28 @@ gulp.task("compress",function(){
 
 gulp.task("hbs",function(){
 	gulp.src("templates/*")
-		// Add minifyed xml using pretty data
+		.pipe(es.map(function(file,done){
+			// TODO: Check for xml
+			if(gutil.isBuffer(file.contents) && file.contents.toString("utf8",0,xmlEncoding.length) === xmlEncoding){
+				file.contents = new Buffer(file.contents.toString().replace(/>\s{0,}</g,"><"));
+			} else if(gutil.isStream(file.contents)) {
+				var isXml = false;
+				file.contents = es.pipeline(
+					file.contents,
+					es.split(),
+					es.mapSync(function(data){
+						if(!isXml && data === xmlEncoding){
+							isXml = true;
+						} else {
+							return data;
+						}
+						done(null,file);
+					}),
+					es.replace(/>\s{0,}</g,"><")
+				);
+			}
+			done(null,file);
+		}))
 		.pipe(hbs({
 			outputType:"bare",
 			wrapped:true
