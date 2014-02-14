@@ -12,11 +12,10 @@
 
 	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
-	// TODO: Use object instead of index to addChapter method.
-	// TODO: Use JS Promises instead of callbacks.
 	// TODO: Add node-style callbacks
-	// TODO: Define Hidden Class beforehand
-
+	// TODO: Add default css style: http://git.io/3rQgWw
+	// TODO: Add ePub Boilerplate: http://git.io/0Lj8rg
+	
 	var handleError = function(error){
 		console.log(error);
 	};
@@ -110,7 +109,6 @@
 		self.book = self._zip = {};
 
 		self._queue = Promise.resolve();
-		//self._queue.defer(loadTemplates);
 		self._queue = self._queue.then(createZip.bind(self)).catch(handleError);
 	};
 
@@ -129,30 +127,37 @@
 			
 			
 		},
-		addChapter:function(a,b){
+		addChapter:function(){
 			// a -> index b -> chapterText
-			var self = this, args = arguments;
+			var self = this;
+
+			var args = Args([
+				{
+					chapterText: Args.STRING | Args.Required
+				},
+				{
+					index: Args.INT | Args.Optional,
+				},
+				{
+					title: Args.STRING | Args.Optional
+				}
+			],arguments);
 
 			var _addChapter = function(){
-				var index,chapterText;
+				// TODO: Find more efficient alternative.
+				// TODO: Add title functionality
+				args.index = args.index || self.book.chaptersAdded;
+				
+				var chapterText = Book.templates.chapter({text:args.chapterText,index:args.index});
 
-				if(args.length === 2){
-					index = (!isNaN(parseFloat(a)) && isFinite(a))?(a):(self.book.chaptersAdded);
-					chapterText = b.toString();
-				} else {
-					chapterText = a.toString();
-					index = self.book.chaptersAdded;
-				}
-
-				chapterText = Book.templates.chapter({text:chapterText,index:index});
 				// Basic XML Parser.
 				if(!!Book.config.validateXML){
 					if(new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
-						throw new Error("Book(): Invalid XHTML in chapter " + index);
+						throw new Error("Book(): Invalid XHTML in chapter " + args.index);
 					}
 				}
 
-				self.book.addText("chap" + index + ".xhtml",chapterText);
+				self.book.addText("chap" + args.index + ".xhtml",chapterText);
 
 				// For content.opf file creation.
 				self.book.chaptersAdded++;

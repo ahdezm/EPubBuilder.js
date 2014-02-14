@@ -24,7 +24,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><container version=\\\"1.0\\\" xmlns=\\\"urn:oasis:names:tc:opendocument:xmlns:container\\\"><rootfiles><rootfile full-path=\\\"OEBPS/content.opf\\\" media-type=\\\"application/oebps-package+xml\\\"/></rootfiles></container>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><container version=\"1.0\" xmlns=\\\"urn:oasis:names:tc:opendocument:xmlns:container\\\"><rootfiles><rootfile full-path=\"OEBPS/content.opf\" media-type=\"application/oebps-package+xml\"/></rootfiles></container>";
   });
 this["Book"] = this["Book"] || {};this["Book"]["templates"] = this["Book"]["templates"] || {};this["Book"]["templates"]["content"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
