@@ -87,23 +87,24 @@
 			throw new Error("Book(): Function must be a new instance.");
 		}
 
-		if(Object.prototype.toString.call(arguments[0]) === "[object Object]"){
-			
-			self.title = arguments[0].title || "";
-			self.author = arguments[0].author || "";
-
-			if("language" in arguments[0]){
-				// TODO: Add a more advanced check.
-				if(/[a-z][a-z]-[A-Z][A-Z]/g.test(arguments[0].language)){
-					self.language = arguments[0].language;
-				} else {
-					throw new Error("Book(): The language parameter must comply with RFC 3066 ex:en-US.");
-				}
-			} else {
-				self.language = "en-US";
+		var args = Args([
+			{
+				title: Args.STRING | Args.Required
+			},
+			{
+				author: Args.STRING | Args.Required
+			},
+			{
+				language: Args.STRING | Args.Optional,
+				_check:function(lang){
+					return /[a-z][a-z]-[A-Z][A-Z]/g.test(lang);
+				},
+				_default:"en-US"
 			}
-		} else {
-			throw new Error("Book(): First Argument must be an Object of Settings.");
+		],arguments);
+
+		for(var arg in args){
+			if(args.hasOwnProperty(arg)){ self[arg] = args[arg]; }
 		}
 
 		self.book = self._zip = {};
