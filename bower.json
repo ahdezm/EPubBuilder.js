@@ -17,6 +17,7 @@
   "dependencies": {
     "handlebars": "~1.3.0",
     "zip.js": "kankje/zip.js",
-    "rsvp": "~3.0.1"
+    "args-js": "~0.10.3",
+    "es6-promise": "~0.1.1"
   }
 }

@@ -1,4 +1,4 @@
-/* global zip, Handlebars, RSVP */
+/* global zip, Handlebars, Promise, Args */
 
 (function(window,undefined){
 	"use strict";
@@ -17,8 +17,6 @@
 	// TODO: Add node-style callbacks
 	// TODO: Define Hidden Class beforehand
 
-	var Promise = window.Promise || RSVP.Promise;
-
 	var handleError = function(error){
 		console.log(error);
 	};
@@ -31,9 +29,12 @@
 		throw new Error("Book(): zip.js is a dependency of EPubBuilder.js");
 	}
 
+	Handlebars.registerHelper("html",function(html){
+		return new Handlebars.SafeString(html);
+	});
+
 	var createZip = function(){
 		var self =  this;
-		// TODO: Add Error callback to Filesystem API.
 		var fs = new zip.fs.FS();
 
 		var meta = fs.root.addDirectory("META-INF");
@@ -55,6 +56,7 @@
 		self.book.chaptersAdded = 1;
 		self._zip = fs;
 	};
+
 	var finishBook = function(){
 		var chapterIndexArray = [];
 		for (var i = 1; i <= this.book.chaptersAdded; i++) {
@@ -77,10 +79,6 @@
 			this.book.addText("content.opf",blobData);
 		}
 	};
-
-	Handlebars.registerHelper("html",function(html){
-		return new Handlebars.SafeString(html);
-	});
 
 	var Book = function(){
 		var self = this;
@@ -107,6 +105,8 @@
 		} else {
 			throw new Error("Book(): First Argument must be an Object of Settings.");
 		}
+
+		self.book = self._zip = {};
 
 		self._queue = Promise.resolve();
 		//self._queue.defer(loadTemplates);
