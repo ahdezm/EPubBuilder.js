@@ -15,7 +15,10 @@
 	// TODO: Add node-style callbacks
 	// TODO: Add default css style: http://git.io/3rQgWw
 	// TODO: Add ePub Boilerplate: http://git.io/0Lj8rg
-	
+	// TODO: Create real documentation (Use epubcheck)
+	// TODO: Added true error handling
+	// TODO: Allow direct file input.
+
 	var handleError = function(error){
 		console.log(error);
 	};
@@ -58,7 +61,7 @@
 
 	var finishBook = function(){
 		var chapterIndexArray = [];
-		for (var i = 1; i <= this.book.chaptersAdded; i++) {
+		for (var i = 1; i < this.book.chaptersAdded; i++) {
 			chapterIndexArray.push(i);
 		}
 		var blobData = Book.templates.content({
@@ -166,8 +169,8 @@
 			self._queue = self._queue.then(_addChapter);
 		},
 		addChapters:function(chapters){
-			for (var i = 0; i < chapters.length; i++) {
-				this.addChapter(chapters[i]);
+			for (var i = chapters.length; i > 0; i--) {
+				this.addChapter(chapters[i-1],i);
 			}
 		}
 	};
