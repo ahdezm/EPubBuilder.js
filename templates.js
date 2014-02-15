@@ -7,8 +7,8 @@ function program1(depth0,data) {
   
   var buffer = "", stack1;
   buffer += "\r\n			<h3 class=\"title\">";
-  if (stack1 = helpers.author) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.author); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.title); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "</h3>\r\n		";
   return buffer;
@@ -30,7 +30,7 @@ function program3(depth0,data) {
   else { stack1 = (depth0 && depth0.index); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "</title>\r\n	<link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" />\r\n</head>\r\n\r\n<body>\r\n\r\n	<div id=\"chapter\">\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.author), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.title), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n\r\n		";
   if (stack1 = helpers.text) { stack1 = stack1.call(depth0, {hash:{},data:data}); }

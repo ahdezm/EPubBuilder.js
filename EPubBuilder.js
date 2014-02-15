@@ -156,7 +156,7 @@
 
 			var args = Args([
 				{
-					chapterText: Args.STRING | Args.Required
+					text: Args.STRING | Args.Required
 				},
 				{
 					index: Args.INT | Args.Optional,
@@ -169,7 +169,7 @@
 
 			var _addChapter = function(){
 
-				var chapterText = Book.templates.chapter({text:args.chapterText,index:args.index});
+				var chapterText = Book.templates.chapter(args);
 
 				// Basic XML Parser.
 				if(!!Book.config.validateXML){

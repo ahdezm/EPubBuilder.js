@@ -10,6 +10,7 @@ var hbs = require("gulp-handlebars");
 var declare = require("gulp-declare");
 
 var path = require("path");
+var jsdom = require("jsdom");
 
 gulp.task("compress",function(){
 	gulp.src("EPubBuilder.js")

@@ -23,7 +23,7 @@
 
 	function init(){
 		window.performance.mark("startBook");
-		console.profile("newBook");
+		//console.profile("newBook");
 
 		book = new Book({
 			title:"Finding Nemo",
@@ -33,7 +33,7 @@
 		book.addChapters(["Hello","World"]);
 
 		book.exportBlob(function(error,blob){
-			console.profileEnd("newBook");
+			//console.profileEnd("newBook");
 			window.performance.mark("endBook");
 			window.performance.measure("totalBook","startBook","endBook");
 
