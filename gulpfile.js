@@ -22,7 +22,10 @@ gulp.task("hbs",function(){
 	gulp.src("templates/*")
 		.pipe(hbs({
 			outputType:"bare",
-			wrapped:true
+			wrapped:true,
+			compilerOprions:{
+				knownOnly:true
+			}
 		}))
 		.pipe(declare({
 			namespace:"Book.templates",

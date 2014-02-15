@@ -2,13 +2,6 @@
 
 (function(window,undefined){
 	"use strict";
-	/*
-	new Book({
-		title:title,
-		author:author,
-		text: @ Array of Chapter Texts
-	},function(book){ @callback });
-	*/
 
 	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
@@ -16,11 +9,43 @@
 	// TODO: Add default css style: http://git.io/3rQgWw
 	// TODO: Add ePub Boilerplate: http://git.io/0Lj8rg
 	// TODO: Create real documentation (Use epubcheck)
-	// TODO: Added true error handling
+	// TODO: Add true error handling
 	// TODO: Allow direct file input.
 
 	var handleError = function(error){
 		console.log(error);
+	};
+
+	var extend = function(original, extended){
+		// TODO:Check performance of extend
+		var key;
+		extended = extended || {};
+
+		for(key in extended){
+			if(extended.hasOwnProperty(key)){
+				original[key] = extended[key];
+			}
+		}
+		return original;
+	};
+
+	var range = function(start, stop, step) {
+		if (arguments.length <= 1) {
+			stop = start || 0;
+			start = 0;
+		}
+		step = arguments[2] || 1;
+
+		var length = Math.max(Math.ceil((stop - start) / step), 0);
+		var idx = 0;
+		var range = new Array(length);
+
+		while(idx < length) {
+			range[idx++] = start;
+			start += step;
+		}
+
+		return range;
 	};
 
 	if("zip" in window){
@@ -31,18 +56,12 @@
 		throw new Error("Book(): zip.js is a dependency of EPubBuilder.js");
 	}
 
-	Handlebars.registerHelper("html",function(html){
-		return new Handlebars.SafeString(html);
-	});
-
 	var createZip = function(){
 		var self =  this;
 		var fs = new zip.fs.FS();
 
 		var meta = fs.root.addDirectory("META-INF");
 		var book = fs.root.addDirectory("OEBPS");
-
-		self.book = book;
 
 		fs.root.addText("mimetype","application/epub+zip");
 
@@ -55,19 +74,18 @@
 
 		book.addText("style.css",Book.templates.style());
 
-		self.book.chaptersAdded = 1;
+		extend(book,self.book);
+		self.book = book;
 		self._zip = fs;
 	};
 
 	var finishBook = function(){
-		var chapterIndexArray = [];
-		for (var i = 1; i < this.book.chaptersAdded; i++) {
-			chapterIndexArray.push(i);
-		}
-		var blobData = Book.templates.content({
+		var indexArray = range(1,this.book.chaptersAdded);
+
+		var metaData = Book.templates.content({
 			title:this.title,
 			author:this.author,
-			chapters:chapterIndexArray,
+			chapters:indexArray,
 			lang:this.language,
 			// UUID Random Generator.
 			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
@@ -76,9 +94,9 @@
 		var file = this.book.getChildByName("content.opf");
 
 		if(!!file){
-			file.data = blobData;
+			file.data = metaData;
 		} else {
-			this.book.addText("content.opf",blobData);
+			this.book.addText("content.opf",metaData);
 		}
 	};
 
@@ -105,11 +123,13 @@
 			}
 		],arguments);
 
-		for(var arg in args){
-			if(args.hasOwnProperty(arg)){ self[arg] = args[arg]; }
-		}
+		extend(self,args);
 
-		self.book = self._zip = {};
+		self.book = {
+			chaptersAdded:1
+		};
+
+		self._zip = {};
 
 		self._queue = Promise.resolve();
 		self._queue = self._queue.then(createZip.bind(self)).catch(handleError);
@@ -140,6 +160,7 @@
 				},
 				{
 					index: Args.INT | Args.Optional,
+					_default:self.book.chaptersAdded
 				},
 				{
 					title: Args.STRING | Args.Optional
@@ -147,10 +168,7 @@
 			],arguments);
 
 			var _addChapter = function(){
-				// TODO: Find more efficient alternative.
-				// TODO: Add title functionality
-				args.index = args.index || self.book.chaptersAdded;
-				
+
 				var chapterText = Book.templates.chapter({text:args.chapterText,index:args.index});
 
 				// Basic XML Parser.

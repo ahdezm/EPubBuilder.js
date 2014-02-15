@@ -1,21 +1,42 @@
 this["Book"] = this["Book"] || {};this["Book"]["templates"] = this["Book"]["templates"] || {};this["Book"]["templates"]["chapter"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\r\n			<h3 class=\"title\">";
+  if (stack1 = helpers.author) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.author); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h3>\r\n		";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\r\n			\r\n			<h3 class=\"title\">Chapter ";
+  if (stack1 = helpers.index) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.index); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h3>\r\n		";
+  return buffer;
+  }
 
   buffer += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n<head>\r\n	<title>Chapter ";
   if (stack1 = helpers.index) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.index); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</title>\r\n	<link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" />\r\n</head>\r\n\r\n<body>\r\n\r\n	<div id=\"chapter\">\r\n		<h3 class=\"title\">Chapter ";
-  if (stack1 = helpers.index) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.index); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</h3>\r\n		";
-  options = {hash:{},data:data};
-  buffer += escapeExpression(((stack1 = helpers.html || (depth0 && depth0.html)),stack1 ? stack1.call(depth0, (depth0 && depth0.text), options) : helperMissing.call(depth0, "html", (depth0 && depth0.text), options)))
-    + "\r\n	</div>\r\n</body>\r\n</html>\r\n";
+    + "</title>\r\n	<link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" />\r\n</head>\r\n\r\n<body>\r\n\r\n	<div id=\"chapter\">\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.author), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n\r\n		";
+  if (stack1 = helpers.text) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.text); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n	</div>\r\n</body>\r\n</html>\r\n";
   return buffer;
   });
 this["Book"] = this["Book"] || {};this["Book"]["templates"] = this["Book"]["templates"] || {};this["Book"]["templates"]["container"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

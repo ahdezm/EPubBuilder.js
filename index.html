@@ -19,22 +19,11 @@
 	/* jshint indent:false */
 	/* global Book */
 
-	// TODO: Add true benchmarking http://benchmarkjs.com/
-	/*function sendToServer(time){
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST','http://localhost:1338');
-		xhr.onload = function(){
-			if(Boolean(this.response)){
-				window.location.reload();
-			}	
-		};
-		xhr.send(time);
-	};*/
 	var book;
 
 	function init(){
 		window.performance.mark("startBook");
-		//console.profile("newBook");
+		console.profile("newBook");
 
 		book = new Book({
 			title:"Finding Nemo",
@@ -44,7 +33,7 @@
 		book.addChapters(["Hello","World"]);
 
 		book.exportBlob(function(error,blob){
-			//console.profileEnd("newBook");
+			console.profileEnd("newBook");
 			window.performance.mark("endBook");
 			window.performance.measure("totalBook","startBook","endBook");
 
