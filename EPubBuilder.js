@@ -6,6 +6,7 @@
 	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
 	// TODO: Add node-style callbacks
+	// TODO: Add EPub3 nav support
 	// TODO: Add default css style: http://git.io/3rQgWw
 	// TODO: Add ePub Boilerplate: http://git.io/0Lj8rg
 	// TODO: Create real documentation (Use epubcheck)
@@ -29,23 +30,25 @@
 		return original;
 	};
 
-	var range = function(start, stop, step) {
-		if (arguments.length <= 1) {
-			stop = start || 0;
+	var range = function(start, end, step) {
+		start = +start || 0;
+		step = typeof step === "number" ? step : (+step || 1);
+
+		if (end === null) {
+			end = start;
 			start = 0;
 		}
-		step = arguments[2] || 1;
+		// use `Array(length)` so engines like Chakra and V8 avoid slower modes
+		// http://youtu.be/XAqIpGU8ZZk#t=17m25s
+		var index = -1,
+		length = Math.max(0, Math.ceil((end - start) / (step || 1))),
+		result = new Array(length);
 
-		var length = Math.max(Math.ceil((stop - start) / step), 0);
-		var idx = 0;
-		var range = new Array(length);
-
-		while(idx < length) {
-			range[idx++] = start;
+		while (++index < length) {
+			result[index] = start;
 			start += step;
 		}
-
-		return range;
+		return result;
 	};
 
 	if("zip" in window){
