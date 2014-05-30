@@ -1,4 +1,4 @@
-/* global zip, Handlebars, Promise, Args */
+/* global JSZip, Handlebars, Promise, Args */
 
 (function(window,undefined){
 	"use strict";
@@ -50,35 +50,31 @@
 		return result;
 	};
 
-	if("zip" in window){
-		// Works with inline script instead of workers to minimize dependencies, this may change later.
-		zip.useWebWorkers = true;
-		zip.useWebWorkerBlobs = true;
-	} else {
-		throw new Error("Book(): zip.js is a dependency of EPubBuilder.js");
+	if(!window.JSZip){
+		throw new Error("Book(): JSZip is a dependency of EPubBuilder.js");
 	}
 
 	var createZip = function(){
 		var self =  this;
-		var fs = new zip.fs.FS();
+		var zip = new JSZip();
 
-		var meta = fs.root.addDirectory("META-INF");
-		var book = fs.root.addDirectory("OEBPS");
+		var meta = zip.folder("META-INF");
+		var book = zip.folder("OEBPS");
 
-		fs.root.addText("mimetype","application/epub+zip");
+		zip.file("mimetype","application/epub+zip");
 
-		meta.addText("container.xml",Book.templates.container());
+		meta.file("container.xml",Book.templates.container());
 
-		book.addText("title_page.xhtml",Book.templates.title_page({
+		book.file("title_page.xhtml",Book.templates.title_page({
 			title:self.title,
 			author:self.author
 		}));
 
-		book.addText("style.css",Book.templates.style());
+		book.file("style.css",Book.templates.style());
 
 		extend(book,self.book);
 		self.book = book;
-		self._zip = fs;
+		self._zip = zip;
 	};
 
 	var finishBook = function(){
@@ -93,13 +89,7 @@
 			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
 		});
 
-		var file = this.book.getChildByName("content.opf");
-
-		if(!!file){
-			file.data = metaData;
-		} else {
-			this.book.addText("content.opf",metaData);
-		}
+		this.book.file("content.opf",metaData);
 	};
 
 	var Book = function(){
@@ -139,15 +129,17 @@
 
 	Book.prototype = {
 		exportBlob:function(done){
+			// TODO: Make function sync
 			var self = this;
 			self._queue = self._queue.then(finishBook.bind(self));
 			
 			self._queue = self._queue.then(function(){
-				self._zip.root.exportBlob(function(blob){
-					done(null,blob.slice(0,blob.size,"application/epub+zip"));
-				},null,function(error){
-					done(error);
-				});
+				try {
+					var blob = self._zip.generate({type:"blob"});
+					done(false,blob.slice(0,blob.size,"application/epub+zip"));
+				} catch(e){
+					done(e);
+				}
 			});
 			
 			
@@ -180,7 +172,7 @@
 					}
 				}
 
-				self.book.addText("chap" + args.index + ".xhtml",chapterText);
+				self.book.file("chap" + args.index + ".xhtml",chapterText);
 
 				// For content.opf file creation.
 				self.book.chaptersAdded++;
