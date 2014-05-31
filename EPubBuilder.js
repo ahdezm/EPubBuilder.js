@@ -1,4 +1,4 @@
-/* global JSZip, Handlebars, Promise, Args */
+/* global JSZip, Promise, Args */
 
 (function(window,undefined){
 	"use strict";

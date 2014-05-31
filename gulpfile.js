@@ -1,10 +1,10 @@
 /* jshint node:true */
 var gulp = require("gulp");
-var gutil = require("gulp-util");
 
 var uglify = require("gulp-uglify");
 var rename = require("gulp-rename");
 var concat = require("gulp-concat");
+var useref = require("gulp-useref");
 
 var hbs = require("gulp-handlebars");
 var declare = require("gulp-declare");
@@ -18,8 +18,11 @@ gulp.task("compress",function(){
 		.pipe(gulp.dest("./"));
 });
 
-gulp.task("concat",function(){
-	
+gulp.task("build",function(){
+	gulp.src("index.html")
+		.pipe(useref.assets())
+		.pipe(uglify())
+		.pipe(gulp.dest("./"));
 });
 
 gulp.task("hbs",function(){

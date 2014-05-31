@@ -22,6 +22,7 @@
     "gulp-handlebars": "^2.1.0",
     "gulp-minify-css": "^0.3.4",
     "gulp-rename": "^1.2.0",
-    "gulp-uglify": "^0.3.0"
+    "gulp-uglify": "^0.3.0",
+    "gulp-useref": "^0.4.3"
   }
 }
