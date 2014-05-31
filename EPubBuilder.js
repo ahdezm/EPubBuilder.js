@@ -1,4 +1,4 @@
-/* global JSZip, Promise, Args */
+/* global jz, Promise, Args */
 
 (function(window,undefined){
 	"use strict";
@@ -50,30 +50,27 @@
 		return result;
 	};
 
-	if(!window.JSZip){
+	/*if(!window.JSZip){
 		throw new Error("Book(): JSZip is a dependency of EPubBuilder.js");
-	}
+	}*/
 
 	var createZip = function(){
 		var self =  this;
-		var zip = new JSZip();
+		
+		var zip = [
+			{ name: "mimetype", buffer: "application/epub+zip"}, //string
+			{ name: "META-INF", dir: [ //folder
+				{ name: "container.xml", buffer: Book.templates.container()}, //ArrayBuffer
+			]},
+			{ name:"OEBPS", dir: [
+				{ name:"title_page.xhtml", buffer:Book.templates.title_page({
+					title:self.title,
+					author:self.author
+				})},
+				{name:"style.css", buffer:Book.templates.style()}
+			]}
+		];
 
-		var meta = zip.folder("META-INF");
-		var book = zip.folder("OEBPS");
-
-		zip.file("mimetype","application/epub+zip");
-
-		meta.file("container.xml",Book.templates.container());
-
-		book.file("title_page.xhtml",Book.templates.title_page({
-			title:self.title,
-			author:self.author
-		}));
-
-		book.file("style.css",Book.templates.style());
-
-		extend(book,self.book);
-		self.book = book;
 		self._zip = zip;
 	};
 
@@ -89,7 +86,7 @@
 			uuid:"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c==="x"?r:r&0x3|0x8;return v.toString(16);})
 		});
 
-		this.book.file("content.opf",metaData);
+		this._zip[2].dir.push({name:"content.opf",buffer:metaData});
 	};
 
 	var Book = function(){
@@ -134,12 +131,13 @@
 			self._queue = self._queue.then(finishBook.bind(self));
 			
 			self._queue = self._queue.then(function(){
-				try {
-					var blob = self._zip.generate({type:"blob"});
-					done(false,blob.slice(0,blob.size,"application/epub+zip"));
-				} catch(e){
+				jz.zip.pack({
+					files:self._zip
+				}).then(function(buffer){
+					done(false,new Blob([buffer],{type:"application/epub+zip"}));
+				}).catch(function(e){
 					done(e);
-				}
+				});
 			});
 			
 			
@@ -172,7 +170,7 @@
 					}
 				}
 
-				self.book.file("chap" + args.index + ".xhtml",chapterText);
+				self._zip[2].dir.push({name:"chap" + args.index + ".xhtml",buffer:chapterText});
 
 				// For content.opf file creation.
 				self.book.chaptersAdded++;
