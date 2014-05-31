@@ -16,20 +16,20 @@
 	/* jshint indent:false */
 	/* global Book */
 
-	var book;
+	//var book;
 
 	function init(){
 		window.performance.mark("startBook");
 		//console.profile("newBook");
 
-		book = new Book({
+		var book = new Book({
 			title:"Finding Nemo",
 			author:"Nemo's Father",
 		});
 
 		book.addChapters(["Hello","World"]);
 
-		book.exportBlob(function(error,blob){
+		book.exportBlob().then(function(blob){
 			//console.profileEnd("newBook");
 			window.performance.mark("endBook");
 			window.performance.measure("totalBook","startBook","endBook");

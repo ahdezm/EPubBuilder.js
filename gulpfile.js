@@ -12,21 +12,21 @@ var declare = require("gulp-declare");
 var path = require("path");
 
 gulp.task("compress",function(){
-	gulp.src("EPubBuilder.js")
+	return gulp.src("EPubBuilder.js")
 		.pipe(uglify())
 		.pipe(rename("EPubBuilder.min.js"))
 		.pipe(gulp.dest("./"));
 });
 
 gulp.task("build",function(){
-	gulp.src("index.html")
+	return gulp.src("index.html")
 		.pipe(useref.assets())
 		.pipe(uglify())
 		.pipe(gulp.dest("./"));
 });
 
 gulp.task("hbs",function(){
-	gulp.src("templates/*")
+	return gulp.src("templates/*")
 		.pipe(hbs({
 			outputType:"bare",
 			wrapped:true,
