@@ -112,13 +112,16 @@
 	};
 
 	Book.prototype = {
-		exportBlob:function(){
+		exportBuffer:function(){
 			var self = this;
 			finishBook.call(self);
 			
 			return jz.zip.pack({
 				files:self._zip
-			}).then(function(buffer){
+			});
+		},
+		exportBlob:function(){
+			return this.exportBuffer().then(function(buffer){
 				return new Blob([buffer],{type:"application/epub+zip"});
 			});
 		},
