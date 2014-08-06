@@ -7,8 +7,8 @@
 	// TODO: Add quick-book functionality.
 	// TODO: Add node-style callbacks
 	// TODO: Add EPub3 nav support
-	// TODO: Add default css style
-	// TODO: Use ePub Boilerplate: http://git.io/0Lj8rg
+	// TODO: Add default css style: http://git.io/3rQgWw
+	// TODO: Add ePub Boilerplate: http://git.io/0Lj8rg
 	// TODO: Create real documentation (Use epubcheck)
 	// TODO: Add true error handling
 
