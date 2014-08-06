@@ -1,7 +1,14 @@
-/* global jz, Args */
-(function(window,undefined){
+/* global define */
+(function(root, factory) {
+	if (typeof define === "function" && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(["args","jz"], factory);
+	} else {
+		// Browser globals
+		root.Book = factory(root.Args,root.jz,root.Views);
+	}
+}(this, function(Args,jz,Views) {
 	"use strict";
-
 	// TODO: Validate all input.
 	// TODO: Add quick-book functionality.
 	// TODO: Add EPub3 nav support
@@ -50,14 +57,14 @@
 		return result;
 	};
 
-	if(!window.jz){
+	if(!jz){
 		throw new Error("Book(): JSZipTools is a dependency of EPubBuilder.js");
 	}
 
 	var finishBook = function(){
 		var indexArray = range(1,this.chaptersAdded);
 
-		var metaData = Book.templates.content({
+		var metaData = Template.content({
 			title:this.title,
 			author:this.author,
 			chapters:indexArray,
@@ -99,14 +106,14 @@
 		self._zip = [
 			{ name: "mimetype", buffer: "application/epub+zip"}, //string
 			{ name: "META-INF", dir: [ //folder
-				{ name: "container.xml", buffer: Book.templates.container()}, //ArrayBuffer
+				{ name: "container.xml", buffer: Template.container()}, //ArrayBuffer
 			]},
 			{ name:"OEBPS", dir: [
-				{ name:"title_page.xhtml", buffer:Book.templates.title_page({
+				{ name:"title_page.xhtml", buffer:Template.title_page({
 					title:self.title,
 					author:self.author
 				})},
-				{name:"style.css", buffer:Book.templates.style()}
+				{name:"style.css", buffer:Template.style()}
 			]}
 		];
 	};
@@ -140,7 +147,7 @@
 				}
 			],arguments);
 
-			var chapterText = Book.templates.chapter(args);
+			var chapterText = Template.chapter(args);
 
 			// Basic XML Parser.
 			if(!!Book.config.validateXML && new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){
@@ -161,16 +168,9 @@
 
 	// TODO: Add a more advanced config function.
 	Book.config = {};
-	Book.templates = {};
-
-	Book.config.templateJS = "templates.js";
-	Book.config.templateCompile = ["content","chapter","title_page"];
 	Book.config.validateXML = true;
-
 	// To prevent changes to config.
 	Object.preventExtensions(Book.config);
 
-	Book.templates = window.Book.templates;
-	window.Book = Book;
-
-})(this);
+	return Book;
+}));
