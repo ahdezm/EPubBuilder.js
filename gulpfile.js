@@ -18,7 +18,7 @@ gulp.task("compress",function(){
 		.pipe(gulp.dest("./"));
 });
 
-gulp.task("build",function(){
+gulp.task("build",["hbs"],function(){
 	return gulp.src("index.html")
 		.pipe(useref.assets())
 		.pipe(uglify())
