@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookID" version="2.0" >
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-		<dc:title>{{title}}</dc:title> 
-		<dc:creator opf:role="aut">{{author}}</dc:creator>
-		<dc:language>{{lang}}</dc:language> 
+		<dc:title>{{=it.title}}</dc:title> 
+		<dc:creator opf:role="aut">{{=it.author}}</dc:creator>
+		<dc:language>{{=it.lang}}</dc:language> 
 		<dc:rights>Public Domain</dc:rights> 
 		<dc:publisher>EPubBuilder.js</dc:publisher> 
-		<dc:identifier id="BookID" opf:scheme="UUID">{{uuid}}</dc:identifier>
+		<dc:identifier id="BookID" opf:scheme="UUID">{{=it.uuid}}</dc:identifier>
 	</metadata>
 	<manifest>
 		<item id="style" href="style.css" media-type="text/css" />
 		<item id="titlepage" href="title_page.xhtml" media-type="application/xhtml+xml" />
-		{{#each chapters}}
-		<item id="chapter{{this}}" href="chap{{this}}.xhtml" media-type="application/xhtml+xml" />
-		{{/each}}
+		{{~it.chapters :index}}
+		<item id="chapter{{=index}}" href="chap{{=index}}.xhtml" media-type="application/xhtml+xml" />
+		{{~}}
 	</manifest>
 	<spine toc="ncx">
 		<itemref idref="titlepage"/>
-		{{#each chapters}}
-		<itemref idref="chapter{{this}}"/>
-		{{/each}}
+		{{~it.chapters :index}}
+		<itemref idref="chapter{{=index}}"/>
+		{{~}}
 	</spine>
 </package>

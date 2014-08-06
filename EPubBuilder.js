@@ -2,7 +2,7 @@
 (function(root, factory) {
 	if (typeof define === "function" && define.amd) {
 		// AMD. Register as an anonymous module.
-		define(["args","jz"], factory);
+		define(["args","jz","views"], factory);
 	} else {
 		// Browser globals
 		root.Book = factory(root.Args,root.jz,root.Views);
@@ -64,7 +64,7 @@
 	var finishBook = function(){
 		var indexArray = range(1,this.chaptersAdded);
 
-		var metaData = Template.content({
+		var metaData = Views["content.opf"]({
 			title:this.title,
 			author:this.author,
 			chapters:indexArray,
@@ -106,14 +106,14 @@
 		self._zip = [
 			{ name: "mimetype", buffer: "application/epub+zip"}, //string
 			{ name: "META-INF", dir: [ //folder
-				{ name: "container.xml", buffer: Template.container()}, //ArrayBuffer
+				{ name: "container.xml", buffer:Views["container.xml"]()}, //ArrayBuffer
 			]},
 			{ name:"OEBPS", dir: [
-				{ name:"title_page.xhtml", buffer:Template.title_page({
+				{ name:"title_page.xhtml", buffer:Views["title_page.xhtml"]({
 					title:self.title,
 					author:self.author
 				})},
-				{name:"style.css", buffer:Template.style()}
+				{name:"style.css", buffer:Views["style.css"]()}
 			]}
 		];
 	};
@@ -147,7 +147,7 @@
 				}
 			],arguments);
 
-			var chapterText = Template.chapter(args);
+			var chapterText = Views["chapter.xhtml"](args);
 
 			// Basic XML Parser.
 			if(!!Book.config.validateXML && new DOMParser().parseFromString(chapterText, "application/xhtml+xml").getElementsByTagName("parsererror").length > 0){

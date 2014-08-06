@@ -6,10 +6,8 @@ var rename = require("gulp-rename");
 var concat = require("gulp-concat");
 var useref = require("gulp-useref");
 
-var hbs = require("gulp-handlebars");
-var declare = require("gulp-declare");
-
-var path = require("path");
+var dotify = require("gulp-dotify");
+var defineModule = require("gulp-define-module");
 
 gulp.task("compress",function(){
 	return gulp.src("EPubBuilder.js")
@@ -18,29 +16,25 @@ gulp.task("compress",function(){
 		.pipe(gulp.dest("./"));
 });
 
-gulp.task("build",["hbs"],function(){
+gulp.task("build",["dot"],function(){
 	return gulp.src("index.html")
 		.pipe(useref.assets())
 		.pipe(uglify())
 		.pipe(gulp.dest("./"));
 });
 
-gulp.task("hbs",function(){
+gulp.task("dot",function(){
 	return gulp.src("templates/*")
-		.pipe(hbs({
-			outputType:"bare",
-			wrapped:true,
-			compilerOprions:{
-				knownOnly:true
-			}
-		}))
-		.pipe(declare({
-			namespace:"Book.templates",
-			processName:function(filePath){
-				return path.basename(filePath,path.extname(filePath));
-			}
+		.pipe(dotify({
+			root:"templates",
+			dictionary:"Views",
+			
 		}))
 		.pipe(concat("templates.js"))
+		.pipe(defineModule("hybrid",{
+			global:"Views",
+			wrapper:"(function(){var Views = {};<%= contents %> return Views;})()"
+		}))
 		//.pipe(uglify())
 		.pipe(gulp.dest("./"));
 });

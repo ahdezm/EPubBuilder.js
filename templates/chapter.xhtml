@@ -2,21 +2,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Chapter {{index}}</title>
+	<title>Chapter {{=it.index}}</title>
 	<link rel="stylesheet" href="style.css" type="text/css" />
 </head>
-
 <body>
-
 	<div id="chapter">
-		{{#if title}}
-			<h3 class="title">{{title}}</h3>
-		{{else}}
-			
-			<h3 class="title">Chapter {{index}}</h3>
-		{{/if}}
+		{{?it.title}}
+			<h3 class="title">{{=it.title}}</h3>
+		{{??}}
+			<h3 class="title">Chapter {{=it.index}}</h3>
+		{{?}}
 
-		{{{text}}}
+		{{=it.text}}
 	</div>
 </body>
 </html>

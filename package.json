@@ -15,14 +15,12 @@
   "author": "polikis",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "event-stream": "^3.1.5",
-    "gulp": "^3.6.2",
-    "gulp-concat": "^2.2.0",
-    "gulp-declare": "^0.2.0",
-    "gulp-handlebars": "^2.1.0",
-    "gulp-minify-css": "^0.3.4",
+    "gulp": "^3.8.7",
+    "gulp-concat": "^2.3.4",
+    "gulp-define-module": "git://github.com/polikis/gulp-define-module",
+    "gulp-dotify": "^0.1.2",
     "gulp-rename": "^1.2.0",
-    "gulp-uglify": "^0.3.0",
-    "gulp-useref": "^0.4.3"
+    "gulp-uglify": "^0.3.1",
+    "gulp-useref": "^0.6.0"
   }
 }
