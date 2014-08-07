@@ -57,10 +57,6 @@
 		return result;
 	};
 
-	if(!jz){
-		throw new Error("Book(): JSZipTools is a dependency of EPubBuilder.js");
-	}
-
 	var finishBook = function(){
 		var indexArray = range(1,this.chaptersAdded);
 
