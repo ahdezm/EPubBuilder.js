@@ -58,7 +58,7 @@
 	};
 
 	var finishBook = function(){
-		var indexArray = range(1,this.chaptersAdded);
+		var indexArray = range(1,this.chaptersAdded + 1);
 
 		var metaData = Views["content.opf"]({
 			title:this.title,
@@ -97,7 +97,7 @@
 
 		extend(self,args);
 
-		self.chaptersAdded = 1;
+		self.chaptersAdded = 0;
 
 		self._zip = [
 			{ name: "mimetype", buffer: "application/epub+zip"}, //string
